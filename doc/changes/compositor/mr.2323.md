@@ -1,0 +1,4 @@
+---
+- mr.2380
+---
+- Change: Renames in `comp/render/*` and `comp/util/comp_render_*` code for consistency.

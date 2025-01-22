@@ -1,93 +1,278 @@
-# Monado Fork Custom VR Driver
+# Monado - XR Runtime (XRT)
 
+<!--
+Copyright 2018-2021, Collabora, Ltd.
 
+SPDX-License-Identifier: CC-BY-4.0
 
-## Getting started
+This must stay in sync with the last section!
+-->
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+> * Main homepage and documentation: <https://monado.freedesktop.org/>
+> * Promotional homepage: <https://monado.dev>
+> * Maintained at <https://gitlab.freedesktop.org/monado/monado>
+> * Latest API documentation: <https://monado.pages.freedesktop.org/monado>
+> * Continuously-updated changelog of the default branch:
+>   <https://monado.pages.freedesktop.org/monado/_c_h_a_n_g_e_l_o_g.html>
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Monado is an open source XR runtime delivering immersive experiences such as VR
+and AR on mobile, PC/desktop, and any other device
+(because gosh darn people
+come up with a lot of weird hardware).
+Monado aims to be a complete and conforming implementation
+of the OpenXR API made by Khronos.
+The project is primarily developed on GNU/Linux, but also runs on Android and Windows.
+"Monado" has no specific meaning and is just a name.
 
-## Add your files
+## Monado source tree
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+* `src/xrt/include` - headers that define the internal interfaces of Monado.
+* `src/xrt/compositor` - code for doing distortion and driving the display hardware of a device.
+* `src/xrt/auxiliary` - utilities and other larger components.
+* `src/xrt/drivers` - hardware drivers.
+* `src/xrt/state_trackers/oxr` - OpenXR API implementation.
+* `src/xrt/targets` - glue code and build logic to produce final binaries.
+* `src/external` - a small collection of external code and headers.
 
+## Getting Started
+
+Dependencies include:
+
+* [CMake][] 3.13 or newer (Note Ubuntu 18.04 only has 3.10)
+* Python 3.6 or newer
+* Vulkan headers and loader - Fedora package `vulkan-loader-devel`
+* OpenGL headers
+* Eigen3 - Debian/Ubuntu package `libeigen3-dev`
+* glslangValidator - Debian/Ubuntu package `glslang-tools`, Fedora package `glslang`.
+* libusb
+* libudev - Debian/Ubuntu package `libudev-dev`, Fedora package `systemd-devel`
+* Video 4 Linux - Debian/Ubuntu package `libv4l-dev`.
+
+Optional (but recommended) dependencies:
+
+* libxcb and xcb-xrandr development packages
+* [OpenHMD][] 0.3.0 or newer (found using pkg-config)
+
+Truly optional dependencies, useful for some drivers, app support, etc.:
+
+* Doxygen - Debian/Ubuntu package `doxygen` and `graphviz`
+* Wayland development packages
+* Xlib development packages
+* libhidapi - Debian/Ubuntu package `libhidapi-dev`
+* OpenCV
+* libuvc - Debian/Ubuntu package `libuvc-dev`
+* libjpeg
+* libbluetooth - Debian/Ubuntu package `libbluetooth-dev`
+* libsdl - Debian/Ubuntu package `libsdl2-dev`
+
+Experimental Windows support requires the Vulkan SDK and also needs or works
+best with the following vcpkg packages installed:
+
+* pthreads eigen3 libusb hidapi zlib doxygen
+
+If you have a recent [vcpkg](https://vcpkg.io) installed and use the appropriate
+CMake toolchain file, the vcpkg manifest in the Monado repository will instruct
+vcpkg to locally install the dependencies automatically. The Vulkan SDK
+installer should set the `VULKAN_SDK` Windows environment variable to point
+at the installation location (for example, `C:/VulkanSDK/1.3.250.1`), though
+make sure you open a new terminal (or open the CMake GUI) *after* doing that
+install to make sure it is available.
+
+Monado has been tested on these distributions, but is expected to work on almost
+any modern distribution.
+
+* Ubuntu 24.04, 22.04, 20.04, (18.04 may not be fully supported)
+* Debian 11 `bookworm`, 10 `buster`
+  * Up-to-date package lists can be found in our CI config file,
+    `.gitlab-ci.yml`
+* Archlinux
+
+These distributions include recent-enough versions of all the
+software to use direct mode,
+without using any external, third-party, or backported
+package sources.
+
+See also [Status of DRM Leases][drm-lease]
+for more details on specific packages, versions, and commits.
+
+Due to the lack of a OpenGL extension: GL_EXT_memory_object_fd on Intel's
+OpenGL driver, only the AMD
+radeonsi driver and the proprietary NVIDIA driver will work for OpenGL OpenXR
+clients. This is due to a requirement of the Compositor. Support status of the
+extension can be found on the [mesamatrix website][mesamatrix-ext].
+
+### CMake
+
+Build process is similar to other CMake builds,
+so something like the following will build it.
+
+Go into the source directory, create a build directory,
+and change into it.
+
+```bash
+mkdir build
+cd build
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/alexander.streissnig/monado-fork-custom-vr-driver.git
-git branch -M main
-git push -uf origin main
+
+Then, invoke [CMake to generate a project][cmake-generate].
+Feel free to change the build type or generator ("Ninja" is fast and parallel) as you see fit.
+
+```bash
+cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles"
 ```
 
-## Integrate with your tools
+If you plan to install the runtime,
+append something like `-DCMAKE_INSTALL_PREFIX=~/.local`
+to specify the root of the install directory.
+(The default install prefix is `/usr/local`.)
 
-- [ ] [Set up project integrations](https://gitlab.com/alexander.streissnig/monado-fork-custom-vr-driver/-/settings/integrations)
+To build, [the generic CMake build commands][cmake-build] below will work on all systems,
+though you can manually invoke your build tool (`make`, `ninja`, etc.) if you prefer.
+The first command builds the runtime and docs,
+and the second, which is optional, installs the runtime under `${CMAKE_INSTALL_PREFIX}`.
 
-## Collaborate with your team
+```bash
+cmake --build .
+cmake --build . --target install
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Alternately, if using Make, the following will build the runtime and docs, then install.
+Replace `make` with `ninja` if you used the Ninja generator.
 
-## Test and Deploy
+```bash
+make
+make install
+```
 
-Use the built-in continuous integration in GitLab.
+Documentation can be browsed by opening `doc/html/index.html` in the build directory in a web browser.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Getting started using OpenXR with Monado
 
-***
+This implements the [OpenXR][] API,
+so to do anything with it, you'll need an application
+that uses OpenXR, along with the OpenXR loader.
+The OpenXR loader is a glue library that connects OpenXR applications to OpenXR runtimes such as Monado
+It determines which runtime to use by looking for the config file `active_runtime.json` (either a symlink to
+or a copy of a runtime manifest) in the usual XDG config paths
+and processes environment variables such as `XR_RUNTIME_JSON=/usr/share/openxr/0/openxr_monado.json`.
+It can also insert OpenXR API Layers without the application or the runtime having to do it.
 
-# Editing this README
+You can use the `hello_xr` sample provided with the OpenXR SDK.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+The OpenXR loader can be pointed to a runtime json file in a nonstandard location with the environment variable `XR_RUNTIME_JSON`. Example:
 
-## Suggestions for a good README
+```bash
+XR_RUNTIME_JSON=~/monado/build/openxr_monado-dev.json ./openxr-example
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+For ease of development Monado creates a runtime manifest file in its build directory using an absolute path to the
+Monado runtime in the build directory called `openxr_monado-dev.json`. Pointing `XR_RUNTIME_JSON` to this
+file allows using Monado after building, without installing.
 
-## Name
-Choose a self-explaining name for your project.
+Note that the loader can always find and load the runtime
+if the path to the runtime library given in the json manifest is an absolute path,
+but if a relative path like `libopenxr_monado.so.0` is given,
+then `LD_LIBRARY_PATH` must include the directory that contains `libopenxr_monado.so.0`.
+The absolute path in `openxr_monado-dev.json` takes care of this for you.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Distribution packages for monado may provide the  "active runtime" file `/etc/xdg/openxr/1/active_runtime.json`.
+In this case the loader will automatically use Monado when starting an OpenXR application. This global configuration
+can be overridden on a per user basis by creating `~/.config/openxr/1/active_runtime.json`.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## Direct mode
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+On AMD and Intel GPUs our direct mode code requires a connected HMD to have
+the `non-desktop` xrandr property set to 1.
+Only the most common HMDs have the needed quirks added to the linux kernel.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+If you know that your HMD lacks the quirk you can run this command **before** or
+after connecting the HMD and it will have it. Where `HDMI-A-0` is the xrandr
+output name where you plug the HMD in.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+```bash
+xrandr --output HDMI-A-0 --prop --set non-desktop 1
+```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+You can verify that it stuck with the command.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+```bash
+xrandr --prop
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+## Running Vulkan Validation
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+To run Monado with Vulkan validation the loader's layer functionality can be used.
+```
+VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation ./build/src/xrt/targets/service/monado-service
+```
+The same can be done when launching a Vulkan client.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+If you want a backtrace to be produced at validation errors, create a `vk_layer_settings.txt`
+file with the following content:
+```
+khronos_validation.debug_action = VK_DBG_LAYER_ACTION_LOG_MSG,VK_DBG_LAYER_ACTION_BREAK
+khronos_validation.report_flags = error,warn
+khronos_validation.log_filename = stdout
+```
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+## Coding style and formatting
 
-## License
-For open source projects, say how it is licensed.
+[clang-format][] is used,
+and a `.clang-format` config file is present in the repo
+to allow your editor to use them.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+To manually apply clang-format to every non-external source file in the tree,
+run this command in the source dir with a `sh`-compatible shell
+(Git for Windows git-bash should be OK):
+
+```bash
+scripts/format-project.sh
+```
+
+You can optionally put something like `CLANG_FORMAT=clang-format-7` before that command
+if your clang-format binary isn't named `clang-format`.
+**Note that you'll typically prefer** to use something like `git clang-format`
+to re-format only your changes, in case version differences in tools result in overall format changes.
+The CI "style" job currently runs on Debian Bullseye, so it has clang-format-11.
+
+[OpenHMD]: http://openhmd.net
+[drm-lease]: https://haagch.frickel.club/#!drmlease%2Emd
+[OpenXR]: https://khronos.org/openxr
+[clang-format]: https://releases.llvm.org/7.0.0/tools/clang/docs/ClangFormat.html
+[cmake-build]: https://cmake.org/cmake/help/v3.12/manual/cmake.1.html#build-tool-mode
+[cmake-generate]: https://cmake.org/cmake/help/v3.12/manual/cmake.1.html
+[CMake]: https://cmake.org
+[mesamatrix-ext]: https://mesamatrix.net/#Version_ExtensionsthatarenotpartofanyOpenGLorOpenGLESversion
+
+## Contributing, Code of Conduct
+
+See `CONTRIBUTING.md` for details of contribution guidelines. GitLab Issues and
+Merge Requests are the preferred way to discuss problems, suggest enhancements,
+or submit changes for review. **In case of a security issue**, you should choose
+the "confidential" option when using the GitLab issues page. For highest
+security, you can send encrypted email (using GPG/OpenPGP) to Rylie Pavlik at
+<rylie.pavlik@collabora.com> and using the associated key from
+<https://keys.openpgp.org/vks/v1/by-fingerprint/45207B2B1E53E1F2755FF63CC5A2D593A61DBC9D>.
+
+Please note that this project is released with a Contributor Code of Conduct.
+By participating in this project you agree to abide by its terms.
+
+We follow the standard freedesktop.org code of conduct,
+available at <https://www.freedesktop.org/wiki/CodeOfConduct/>,
+which is based on the [Contributor Covenant](https://www.contributor-covenant.org).
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be
+reported by contacting:
+
+* First-line project contacts:
+  * Rylie Pavlik <rylie.pavlik@collabora.com>
+  * Frederic Plourde <frederic.plourde@collabora.com>
+  * Jakob Bornecrantz <tbornecrantz@nvidia.com>
+* freedesktop.org contacts: see most recent list at <https://www.freedesktop.org/wiki/CodeOfConduct/>
+
+Code of Conduct section excerpt adapted from the
+[Contributor Covenant](https://www.contributor-covenant.org), version 1.4.1,
+available at
+<https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>, and
+from the freedesktop.org-specific version of that code, available at
+<https://www.freedesktop.org/wiki/CodeOfConduct/>, used under CC-BY-4.0.
