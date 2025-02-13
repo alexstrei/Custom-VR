@@ -31,6 +31,7 @@
 #include "xrt/xrt_results.h"
 
 #include <stdio.h>
+#include <cjson/cJSON.h>
 
 
 /*
@@ -162,6 +163,7 @@ custom_vr_get_visibility_mask(struct xrt_device *xdev,
 	return XRT_SUCCESS;
 }
 
+
 struct xrt_device *
 custom_vr_create(void)
 {
@@ -192,8 +194,8 @@ custom_vr_create(void)
 	hmd->log_level = debug_get_log_option_custom_vr_log();
 
 	// Print name.
-	snprintf(hmd->base.str, XRT_DEVICE_NAME_LEN, "Sample HMD");
-	snprintf(hmd->base.serial, XRT_DEVICE_NAME_LEN, "Sample HMD S/N");
+	snprintf(hmd->base.str, XRT_DEVICE_NAME_LEN, "Custom VR HMD");
+	snprintf(hmd->base.serial, XRT_DEVICE_NAME_LEN, "Custom VR HMD S/N");
 
 	m_relation_history_create(&hmd->relation_hist);
 
@@ -206,7 +208,7 @@ custom_vr_create(void)
 
 	// Set up display details
 	// refresh rate
-	hmd->base.hmd->screens[0].nominal_frame_interval_ns = time_s_to_ns(1.0f / 90.0f);
+	hmd->base.hmd->screens[0].nominal_frame_interval_ns = time_s_to_ns(1.0f / 60.0f);
 
 	const double hFOV = 90 * (M_PI / 180.0);
 	const double vFOV = 96.73 * (M_PI / 180.0);
@@ -226,26 +228,11 @@ custom_vr_create(void)
 		custom_vr_destroy(&hmd->base);
 		return NULL;
 	}
-	const int panel_w = 1080;
-	const int panel_h = 1200;
 
-	// Single "screen" (always the case)
-	hmd->base.hmd->screens[0].w_pixels = panel_w * 2;
-	hmd->base.hmd->screens[0].h_pixels = panel_h;
-
-	// Left, Right
-	for (uint8_t eye = 0; eye < 2; ++eye) {
-		hmd->base.hmd->views[eye].display.w_pixels = panel_w;
-		hmd->base.hmd->views[eye].display.h_pixels = panel_h;
-		hmd->base.hmd->views[eye].viewport.y_pixels = 0;
-		hmd->base.hmd->views[eye].viewport.w_pixels = panel_w;
-		hmd->base.hmd->views[eye].viewport.h_pixels = panel_h;
-		// if rotation is not identity, the dimensions can get more complex.
-		hmd->base.hmd->views[eye].rot = u_device_rotation_ident;
-	}
-	// left eye starts at x=0, right eye starts at x=panel_width
-	hmd->base.hmd->views[0].viewport.x_pixels = 0;
-	hmd->base.hmd->views[1].viewport.x_pixels = panel_w;
+	struct u_extents_2d panel_size;
+	panel_size.h_pixels=1600;
+	panel_size.w_pixels=1600*2;
+	u_extents_2d_split_side_by_side(&hmd->base ,&panel_size);
 
 	// Distortion information, fills in xdev->compute_distortion().
 	u_distortion_mesh_set_none(&hmd->base);
@@ -258,9 +245,25 @@ custom_vr_create(void)
 	m_relation_history_push(hmd->relation_hist, &identity, now);
 
 	// Setup variable tracker: Optional but useful for debugging
-	u_var_add_root(hmd, "Sample HMD", true);
+	u_var_add_root(hmd, "Custom VR HMD", true);
 	u_var_add_log_level(hmd, &hmd->log_level, "log_level");
 
 
 	return &hmd->base;
+}
+
+int
+custom_vr_found(struct xrt_prober *xp,
+			struct xrt_prober_device **devices,
+			size_t device_count,
+			size_t index,
+			cJSON *attached_data,
+			struct xrt_device **out_xdev)
+{
+	struct xrt_device *device = custom_vr_create();
+	if (!device) {
+		return 0;
+	}
+	out_xdev[0] = device;
+	return 1;
 }

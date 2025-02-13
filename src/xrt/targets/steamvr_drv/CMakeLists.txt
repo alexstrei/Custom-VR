@@ -59,7 +59,7 @@ elseif(NOT ANDROID)
 	endif()
 endif()
 
-# message("SteamVR plugin path: ${PLUGINDIR}")
+ message("SteamVR plugin path: ${PLUGINDIR}")
 set_target_properties(driver_monado PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PLUGINDIR}")
 
 # don't add lib prefix to driver_monado.so

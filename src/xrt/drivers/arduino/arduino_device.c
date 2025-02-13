@@ -35,6 +35,8 @@
 #include <assert.h>
 
 
+#define M_PI (3.14159265358979323846)
+
 DEBUG_GET_ONCE_LOG_OPTION(arduino_log, "ARDUINO_LOG", U_LOGGING_WARN)
 
 /*

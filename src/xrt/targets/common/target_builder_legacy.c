@@ -24,6 +24,10 @@ static const char *driver_list[] = {
     "hydra",
 #endif
 
+#ifdef XRT_BUILD_DRIVER_CUSTOM_VR
+	"custom_vr",
+#endif
+
 #ifdef XRT_BUILD_DRIVER_HDK
     "hdk",
 #endif

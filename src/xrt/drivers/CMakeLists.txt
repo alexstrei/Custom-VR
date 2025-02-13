@@ -77,6 +77,18 @@ if(XRT_BUILD_DRIVER_QWERTY)
 	target_include_directories(drv_qwerty_includes INTERFACE qwerty)
 endif()
 
+if(XRT_BUILD_DRIVER_CUSTOM_VR)
+	add_library(
+			drv_custom_vr STATIC
+			custom_vr/custom_vr_device.c
+			custom_vr/custom_vr_prober.c
+			custom_vr/custom_vr_interface.h
+	)
+	target_link_libraries(drv_custom_vr PRIVATE xrt-interfaces aux_util SDL2::SDL2)
+	list(APPEND ENABLED_DRIVERS custom_vr)
+
+endif()
+
 if(XRT_BUILD_DRIVER_HDK)
 	set(HDK_SOURCE_FILES)
 

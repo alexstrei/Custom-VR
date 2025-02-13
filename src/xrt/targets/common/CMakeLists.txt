@@ -28,6 +28,10 @@ if(XRT_BUILD_DRIVER_RIFT_S)
 	target_sources(target_lists PRIVATE target_builder_rift_s.c)
 endif()
 
+if(XRT_BUILD_DRIVER_CUSTOM_VR)
+	target_sources(target_lists PRIVATE target_builder_custom_vr.c)
+endif()
+
 if(XRT_BUILD_DRIVER_SURVIVE OR XRT_BUILD_DRIVER_VIVE)
 	target_sources(target_lists PRIVATE target_builder_lighthouse.c)
 endif()
@@ -72,6 +76,9 @@ if(XRT_BUILD_DRIVER_ARDUINO)
 	target_link_libraries(target_lists PRIVATE drv_arduino)
 endif()
 
+if(XRT_BUILD_DRIVER_CUSTOM_VR)
+	target_link_libraries(target_lists PRIVATE drv_custom_vr)
+endif()
 target_link_libraries(target_lists PRIVATE drv_cemu)
 
 if(XRT_BUILD_DRIVER_DAYDREAM)

@@ -20,6 +20,11 @@
 #include "simulated/simulated_interface.h"
 #endif
 
+#ifdef XRT_BUILD_DRIVER_CUSTOM_VR
+#include "custom_vr/custom_vr_interface.h"
+#endif
+
+
 #ifdef XRT_BUILD_DRIVER_HDK
 #include "hdk/hdk_interface.h"
 #endif
@@ -108,6 +113,7 @@ xrt_builder_create_func_t target_builder_list[] = {
     t_builder_qwerty_create,
 #endif // T_BUILDER_QWERTY
 
+
 #ifdef T_BUILDER_REMOTE // High up to override any real hardware.
     t_builder_remote_create,
 #endif // T_BUILDER_REMOTE
@@ -115,6 +121,11 @@ xrt_builder_create_func_t target_builder_list[] = {
 #ifdef T_BUILDER_SIMULATED // High up to override any real hardware.
     t_builder_simulated_create,
 #endif // T_BUILDER_SIMULATED
+
+#ifdef T_BUILDER_CUSTOM_VR
+    t_builder_custom_vr_create,
+#endif  // T_BUILDER_CUSTOM_VR
+
 
 #ifdef XRT_BUILD_DRIVER_RIFT_S
     rift_s_builder_create,
@@ -178,6 +189,10 @@ struct xrt_prober_entry target_entry_list[] = {
     {PSMV_VID, PSMV_PID_ZCM1, psmv_found, "PS Move Controller (ZCM1)", "psmv"},
     {PSMV_VID, PSMV_PID_ZCM2, psmv_found, "PS Move Controller (ZCM2)", "psmv"},
 #endif // XRT_BUILD_DRIVER_PSMV
+
+#ifdef XRT_BUILD_DRIVER_CUSTOM_VR
+    {CUSTOM_VR_DISPLAY_VID, CUSTOM_VR_DISPLAY_PID, custom_vr_found, "Custom VR Headset", "custom_vr"},
+#endif // XRT_BUILD_DRIVER_CUSTOM_VR
 
 #ifdef XRT_BUILD_DRIVER_PSSENSE
     {PSSENSE_VID, PSSENSE_PID_LEFT, pssense_found, "PlayStation VR2 Sense Controller (L)", "pssense"},

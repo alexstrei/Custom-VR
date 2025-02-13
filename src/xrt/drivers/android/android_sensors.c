@@ -43,7 +43,7 @@ android_sensor_callback(int fd, int events, void *data)
 	if (d->accelerometer == NULL || d->gyroscope == NULL)
 		return 1;
 
-	ASensorEvent event;
+	SensorEvent event;
 	struct xrt_vec3 gyro;
 	struct xrt_vec3 accel;
 	while (ASensorEventQueue_getEvents(d->event_queue, &event, 1) > 0) {

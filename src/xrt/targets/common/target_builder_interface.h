@@ -35,6 +35,10 @@
 #define T_BUILDER_REMOTE
 #endif
 
+#if defined(XRT_BUILD_DRIVER_CUSTOM_VR) || defined(XRT_DOXYGEN)
+#define T_BUILDER_CUSTOM_VR
+#endif
+
 #if defined(XRT_BUILD_DRIVER_QWERTY) || defined(XRT_DOXYGEN)
 #define T_BUILDER_QWERTY
 #endif
@@ -101,6 +105,15 @@ t_builder_north_star_create(void);
 struct xrt_builder *
 t_builder_qwerty_create(void);
 #endif
+
+#ifdef T_BUILDER_QWERTY
+/*!
+ * The qwerty driver builder.
+ */
+struct xrt_builder *
+t_builder_custom_vr_create(void);
+#endif
+
 
 #ifdef T_BUILDER_REMOTE
 /*!
