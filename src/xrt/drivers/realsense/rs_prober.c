@@ -165,7 +165,7 @@ create_tracked_rs_device(struct xrt_prober *xp)
 	rs2_error *e = NULL;
 	struct rs_container rsc = {0};
 	int expected_tracking = debug_get_num_option_rs_tracking();
-#ifdef XRT_FEATURE_SLAM
+#ifdef XRT_FEATURE_SLAM || XRT_FEATURE_SLAM_WIN
 	bool external_slam_supported = true;
 #else
 	bool external_slam_supported = false;
@@ -212,7 +212,9 @@ create_tracked_rs_device(struct xrt_prober *xp)
 		} else if (has_hdev && external_slam_supported) {
 			dev = rs_hdev_create(xp, hdev_idx);
 		} else {
-			INFO("No RealSense devices that can be tracked were found");
+			dev = rs_hdev_create(xp, hdev_idx);
+
+			// INFO("No RealSense devices that can be tracked were found");
 		}
 	} else if (expected_tracking == RS_TRACKING_DISABLED) {
 		INFO("RS_TRACKING=%d (DISABLED) so skipping any RealSense device", RS_TRACKING_DISABLED);

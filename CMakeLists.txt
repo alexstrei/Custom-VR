@@ -271,7 +271,8 @@ set(XRT_FEATURE_OPENXR_DEBUG_UTILS OFF) # Has never been enabled
 option_with_deps(XRT_FEATURE_RENDERDOC "Enable RenderDoc API" DEPENDS "RT_LIBRARY OR WIN32 OR ANDROID")
 option_with_deps(XRT_FEATURE_SERVICE "Enable separate service module for OpenXR runtime" DEPENDS XRT_MODULE_IPC XRT_FEATURE_OPENXR)
 option_with_deps(XRT_FEATURE_SERVICE_SYSTEMD "Enable systemd socket activation of the service" DEPENDS XRT_HAVE_SYSTEMD XRT_FEATURE_SERVICE)
-option_with_deps(XRT_FEATURE_SLAM "Enable SLAM tracking support" DEPENDS XRT_HAVE_OPENCV XRT_HAVE_LINUX)
+option_with_deps(XRT_FEATURE_SLAM "Enable SLAM tracking support" DEPENDS XRT_HAVE_OPENCV)
+option_with_deps(XRT_FEATURE_SLAM_WIN "Enable SLAM tracking support for windows " DEPENDS XRT_HAVE_OPENCV WIN32)
 option(XRT_FEATURE_SSE2 "Build using SSE2 instructions, if building for 32-bit x86" ON)
 option_with_deps(XRT_FEATURE_STEAMVR_PLUGIN "Build SteamVR plugin" DEPENDS "NOT ANDROID")
 option_with_deps(XRT_FEATURE_TRACING "Enable debug tracing on supported platforms" DEFAULT OFF DEPENDS "XRT_HAVE_PERCETTO OR XRT_HAVE_TRACY")
@@ -307,7 +308,7 @@ option_with_deps(XRT_BUILD_DRIVER_ANDROID "Enable Android sensors driver" DEPEND
 option_with_deps(XRT_BUILD_DRIVER_ARDUINO "Enable Arduino input device with BLE" DEPENDS XRT_HAVE_DBUS)
 option_with_deps(XRT_BUILD_DRIVER_DAYDREAM "Enable the Google Daydream View controller driver (BLE)" DEPENDS XRT_HAVE_DBUS)
 option_with_deps(XRT_BUILD_DRIVER_DEPTHAI "DepthAI" DEPENDS depthai_FOUND)
-option_with_deps(XRT_BUILD_DRIVER_EUROC "Enable EuRoC dataset driver for SLAM evaluation" DEPENDS XRT_HAVE_OPENCV "NOT MSVC")
+option_with_deps(XRT_BUILD_DRIVER_EUROC "Enable EuRoC dataset driver for SLAM evaluation" DEPENDS XRT_HAVE_OPENCV )
 option_with_deps(XRT_BUILD_DRIVER_HANDTRACKING "Enable Camera Hand Tracking driver" DEPENDS XRT_MODULE_MERCURY_HANDTRACKING)
 option_with_deps(XRT_BUILD_DRIVER_TWRAP "Enable Tracking Wrapper drivers" ON) # only depends on imu
 option_with_deps(XRT_BUILD_DRIVER_HDK "Enable HDK driver" DEPENDS XRT_HAVE_INTERNAL_HID)
@@ -401,6 +402,7 @@ list(
 	AVAILABLE_DRIVERS
 	"ANDROID"
 	"ARDUINO"
+	"CUSTOM_VR"
 	"DAYDREAM"
 	"SIMULATED"
 	"HANDTRACKING"
@@ -620,6 +622,7 @@ message(STATUS "#    FEATURE_RENDERDOC:                             ${XRT_FEATUR
 message(STATUS "#    FEATURE_SERVICE:                               ${XRT_FEATURE_SERVICE}")
 message(STATUS "#    FEATURE_SERVICE_SYSTEMD:                       ${XRT_FEATURE_SERVICE_SYSTEMD}")
 message(STATUS "#    FEATURE_SLAM:                                  ${XRT_FEATURE_SLAM}")
+message(STATUS "#    FEATURE_SLAM_WIN:                              ${XRT_FEATURE_SLAM_WIN}")
 message(STATUS "#    FEATURE_SSE2:                                  ${XRT_FEATURE_SSE2}")
 message(STATUS "#    FEATURE_STEAMVR_PLUGIN:                        ${XRT_FEATURE_STEAMVR_PLUGIN}")
 message(STATUS "#    FEATURE_TRACING:                               ${XRT_FEATURE_TRACING}")

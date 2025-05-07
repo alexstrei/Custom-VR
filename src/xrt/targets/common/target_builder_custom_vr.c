@@ -20,6 +20,7 @@
 
 #include <assert.h>
 
+#include "realsense/rs_interface.h"
 
 #ifndef XRT_BUILD_DRIVER_CUSTOM_VR
 #error "Must only be built with XRT_BUILD_DRIVER_CUSTOM_VR set"
@@ -55,14 +56,31 @@ custom_vr_estimate_system(struct xrt_builder *xb,
                        struct xrt_prober *xp,
                        struct xrt_builder_estimate *estimate)
 {
-	if (!debug_get_bool_option_enable_custom_vr()) {
-		return XRT_SUCCESS;
-	}
+	struct xrt_prober_device **xpdevs = NULL;
+	size_t xpdev_count = 0;
+	xrt_result_t xret = XRT_SUCCESS;
 
+	xret = xrt_prober_lock_list(xp, &xpdevs, &xpdev_count);
+	if (xret != XRT_SUCCESS) {
+		return xret;
+	}
+	estimate->maybe.head = true;
 	estimate->certain.head = true;
-	estimate->certain.left = true;
-	estimate->certain.right = true;
-	estimate->priority = -25;
+
+	estimate->certain.left = false;
+	estimate->certain.right = false;
+	estimate->maybe.left = false;
+	estimate->maybe.right = false;
+
+	estimate->certain.dof6 =
+		estimate->certain.dof6 || u_builder_find_prober_device(xpdevs, xpdev_count,                  //
+															   REALSENSE_D435I_VID, REALSENSE_D435I_PID, //
+															   XRT_BUS_TYPE_USB);
+
+	xret = xrt_prober_unlock_list(xp, &xpdevs);
+	   if (xret != XRT_SUCCESS) {
+		   return xret;
+	   }
 
 	return XRT_SUCCESS;
 }
@@ -77,6 +95,7 @@ custom_vr_open_system_impl(struct xrt_builder *xb,
                         struct u_builder_roles_helper *ubrh)
 {
 	struct xrt_device *head = NULL;
+	struct xrt_device *slam_device = NULL;
 
 	enum u_logging_level log_level = debug_get_log_option_custom_vr_log();
 
