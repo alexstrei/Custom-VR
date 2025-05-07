@@ -20,7 +20,7 @@
 #endif
 
 static inline bool
-vit_get_proc(void *handle, const char *name, LIBTYPE proc_ptr)
+vit_get_proc(LIBTYPE handle, const char *name, void** proc_ptr)
 {
 #if defined(XRT_OS_LINUX) || defined(XRT_OS_ANDROID)
 	void *proc = dlsym(handle, name);
@@ -34,13 +34,13 @@ vit_get_proc(void *handle, const char *name, LIBTYPE proc_ptr)
 	return true;
 #elif defined(XRT_OS_WINDOWS)
 	FARPROC proc = GetProcAddress(handle, name);
-	DWORD err = GetLastError();
-	if (err != 0) {
-		U_LOG_E("Failed to load symbol on windows: %s", name);
+	if (proc == NULL) {
+		DWORD err = GetLastError();
+		U_LOG_E("Failed to load symbol on windows: %s %lu", name, err);
 		return false;
 	}
 
-	*(void **)proc_ptr = proc;
+	*proc_ptr = proc;
 	return true;
 #else
 #error "Unknown platform"
