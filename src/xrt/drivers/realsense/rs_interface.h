@@ -65,6 +65,9 @@ rs_source_create(struct xrt_frame_context *xfctx, int device_idx);
 struct xrt_device *
 rs_create_tracked_device_internal_slam(void);
 
+
+    struct xrt_device *
+create_tracked_rs_device(struct xrt_prober *xp);
 /*!
  * @dir drivers/realsense
  *
