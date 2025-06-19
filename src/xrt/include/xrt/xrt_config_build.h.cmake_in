@@ -73,6 +73,7 @@
 #cmakedefine XRT_FEATURE_SERVICE
 #cmakedefine XRT_FEATURE_SERVICE_SYSTEMD
 #cmakedefine XRT_FEATURE_SLAM
+#cmakedefine XRT_FEATURE_SLAM_WIN
 #cmakedefine XRT_FEATURE_SSE2
 #cmakedefine XRT_FEATURE_STEAMVR_PLUGIN
 #cmakedefine XRT_FEATURE_TRACING

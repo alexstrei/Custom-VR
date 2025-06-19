@@ -212,9 +212,8 @@ create_tracked_rs_device(struct xrt_prober *xp)
 		} else if (has_hdev && external_slam_supported) {
 			dev = rs_hdev_create(xp, hdev_idx);
 		} else {
-			dev = rs_hdev_create(xp, hdev_idx);
-
-			// INFO("No RealSense devices that can be tracked were found");
+			// dev = rs_hdev_create(xp, hdev_idx);
+			INFO("No RealSense devices that can be tracked were found");
 		}
 	} else if (expected_tracking == RS_TRACKING_DISABLED) {
 		INFO("RS_TRACKING=%d (DISABLED) so skipping any RealSense device", RS_TRACKING_DISABLED);

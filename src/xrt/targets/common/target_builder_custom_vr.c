@@ -129,7 +129,7 @@ custom_vr_open_system_impl(struct xrt_builder *xb,
 
 	if (slam_device != NULL) {
 		head_wrap = multi_create_tracking_override(XRT_TRACKING_OVERRIDE_DIRECT, cv_device, slam_device,
-												   XRT_INPUT_GENERIC_TRACKER_POSE, &head_offset);
+												   XRT_INPUT_GENERIC_HEAD_POSE, &head_offset);
 	} else {
 		// No head tracker, no head tracking.
 		head_wrap = cv_device;
@@ -144,27 +144,6 @@ custom_vr_open_system_impl(struct xrt_builder *xb,
 	ubrh->head = head_wrap;
 
 	return XRT_SUCCESS;
-
-///---------------------------------------------------------------------------
-
-
-	// struct xrt_device *head = NULL;
-	// struct xrt_device *slam_device = NULL;
-	//
-	// enum u_logging_level log_level = debug_get_log_option_custom_vr_log();
-	//
-	// head = custom_vr_create();
-	// if (head == NULL) {
-	// 	return XRT_ERROR_DEVICE_CREATION_FAILED;
-	// }
-	// // Add to device list.
-	// xsysd->xdevs[xsysd->xdev_count++] = head;
-	//
-	// // Assign to role(s).
-	// ubrh->head = head;
-	//
-	// return XRT_SUCCESS;
-
 }
 
 static void
