@@ -65,13 +65,13 @@
 #define DEFAULT_STEREO                  true
 #define DEFAULT_XRT_VIDEO_FORMAT        XRT_FORMAT_L8           // 8-bit luminance
 #define DEFAULT_VIDEO_FORMAT            RS2_FORMAT_Y8                    // 8-bit mono
-#define DEFAULT_VIDEO_WIDTH             848                      // optimal IR/depth resolution for D435 :contentReference[oaicite:0]{index=0}
-#define DEFAULT_VIDEO_HEIGHT            480                      // “
+#define DEFAULT_VIDEO_WIDTH             640                      // optimal IR/depth resolution for D435 :contentReference[oaicite:0]{index=0}
+#define DEFAULT_VIDEO_HEIGHT            360                      // “
 #define DEFAULT_VIDEO_FPS               30                      // common frame rate for IR & color
 #define DEFAULT_VIDEO_CHANGE_EXPOSURE   true
 #define DEFAULT_VIDEO_AUTOEXPOSURE      false                   // start in manual mode
-#define DEFAULT_VIDEO_EXPOSURE          33000                   // 33 ms, in µs (tuning guide example) :contentReference[oaicite:1]{index=1}
-#define DEFAULT_VIDEO_GAIN              16                      // lowest gain for best depth precision :contentReference[oaicite:2]{index=2}
+#define DEFAULT_VIDEO_EXPOSURE          14200                   // 33 ms, in µs (tuning guide example) :contentReference[oaicite:1]{index=1}
+#define DEFAULT_VIDEO_GAIN              36                     // lowest gain for best depth precision :contentReference[oaicite:2]{index=2}
 
 // IMU (only on D435i)
 #define DEFAULT_GYRO_FPS                200                     // choose 200 Hz out of {200,400} :contentReference[oaicite:3]{index=3}
@@ -530,9 +530,9 @@ set_option_in_all_sensors(struct rs_source *rs, enum rs2_option option, float va
 static void
 update_options(struct rs_source *rs)
 {
-	// set_option_in_all_sensors(rs, RS2_OPTION_EXPOSURE, rs->video_exposure);
-	// set_option_in_all_sensors(rs, RS2_OPTION_GAIN, rs->video_gain);
-	// set_option_in_all_sensors(rs, RS2_OPTION_ENABLE_AUTO_EXPOSURE, rs->video_autoexposure);
+	set_option_in_all_sensors(rs, RS2_OPTION_EXPOSURE, rs->video_exposure);
+	set_option_in_all_sensors(rs, RS2_OPTION_GAIN, rs->video_gain);
+	set_option_in_all_sensors(rs, RS2_OPTION_ENABLE_AUTO_EXPOSURE, rs->video_autoexposure);
 }
 
 /*
