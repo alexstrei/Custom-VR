@@ -1053,8 +1053,9 @@ setup_ui(TrackerSlam &t)
 	u_var_add_button(&t, &t.reset_state_btn, "Reset tracker state");
 
 	u_var_add_bool(&t, &t.gt.override_tracking, "Track with ground truth (if available)");
+#ifdef XRT_DRIVER_EUROC
 	euroc_recorder_add_ui(t.euroc_recorder, &t, "");
-
+#endif
 	u_var_add_gui_header(&t, NULL, "Trajectory Filter");
 	u_var_add_bool(&t, &t.filter.use_moving_average_filter, "Enable moving average filter");
 	u_var_add_f64(&t, &t.filter.window, "Window size (ms)");

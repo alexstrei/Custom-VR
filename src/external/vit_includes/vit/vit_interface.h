@@ -16,6 +16,15 @@
 
 #pragma once
 
+#ifdef XRT_OS_WINDOWS
+#include <windows.h>
+#define LIBTYPE HINSTANCE
+#define CLOSELIB(lib) FreeLibrary((lib))
+#elif defined(XRT_OS_LINUX) || defined(XRT_OS_ANDROID)
+#define LIBTYPE void*
+#define CLOSELIB(lib) dlclose((lib))
+#endif
+
 #if defined(__cplusplus)
 extern "C" {
 #endif

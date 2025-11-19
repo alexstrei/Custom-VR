@@ -20,7 +20,7 @@
 #endif
 
 static inline bool
-vit_get_proc(void *handle, const char *name, void *proc_ptr)
+vit_get_proc(LIBTYPE handle, const char *name, void** proc_ptr)
 {
 #if defined(XRT_OS_LINUX) || defined(XRT_OS_ANDROID)
 	void *proc = dlsym(handle, name);
@@ -32,8 +32,19 @@ vit_get_proc(void *handle, const char *name, void *proc_ptr)
 
 	*(void **)proc_ptr = proc;
 	return true;
+#elif defined(XRT_OS_WINDOWS)
+	FARPROC proc = GetProcAddress(handle, name);
+	if (proc == NULL) {
+		DWORD err = GetLastError();
+		U_LOG_E("Failed to load symbol on windows: %s %lu", name, err);
+		return false;
+	}
+
+	*proc_ptr = proc;
+	return true;
 #else
 #error "Unknown platform"
+
 #endif
 }
 
@@ -44,6 +55,13 @@ t_vit_bundle_load(struct t_vit_bundle *vit, const char *path)
 	vit->handle = dlopen(path, RTLD_LAZY);
 	if (vit->handle == NULL) {
 		U_LOG_E("Failed to open VIT library: %s", dlerror());
+		return false;
+	}
+#elif defined(XRT_OS_WINDOWS)
+	vit->handle=LoadLibrary(path);
+	if (vit->handle == NULL) {
+		DWORD err = GetLastError();
+		U_LOG_E("Failed to open VIT library: %lu",err);
 		return false;
 	}
 #else
@@ -66,7 +84,7 @@ t_vit_bundle_load(struct t_vit_bundle *vit, const char *path)
 		U_LOG_E("Incompatible versions: expecting %u.%u.%u but got %u.%u.%u",                 //
 		        VIT_HEADER_VERSION_MAJOR, VIT_HEADER_VERSION_MINOR, VIT_HEADER_VERSION_PATCH, //
 		        vit->version.major, vit->version.minor, vit->version.patch);
-		dlclose(vit->handle);
+		t_vit_bundle_unload(vit);
 		return false;
 	}
 
@@ -98,8 +116,8 @@ t_vit_bundle_load(struct t_vit_bundle *vit, const char *path)
 void
 t_vit_bundle_unload(struct t_vit_bundle *vit)
 {
-#if defined(XRT_OS_LINUX) || defined(XRT_OS_ANDROID)
-	dlclose(vit->handle);
+#if defined(XRT_OS_LINUX) || defined(XRT_OS_ANDROID) || defined(XRT_OS_WINDOWS)
+	CLOSELIB(vit->handle);
 #else
 #error "Unknown platform"
 #endif

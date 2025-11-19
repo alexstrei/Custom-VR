@@ -84,7 +84,7 @@ if(XRT_BUILD_DRIVER_CUSTOM_VR)
 			custom_vr/custom_vr_prober.c
 			custom_vr/custom_vr_interface.h
 	)
-	target_link_libraries(drv_custom_vr PRIVATE xrt-interfaces aux_util SDL2::SDL2)
+	target_link_libraries(drv_custom_vr PRIVATE xrt-interfaces aux_util)
 	list(APPEND ENABLED_DRIVERS custom_vr)
 
 endif()

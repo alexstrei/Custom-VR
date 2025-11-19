@@ -23,7 +23,7 @@ extern "C" {
  */
 struct t_vit_bundle
 {
-	void *handle;
+	LIBTYPE handle;
 
 	struct
 	{

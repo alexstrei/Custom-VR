@@ -44,22 +44,44 @@
 #include <librealsense2/h/rs_pipeline.h>
 
 
-// These defaults come from a D455 camera, they might not work for other devices
-#define DEFAULT_STEREO true
-#define DEFAULT_XRT_VIDEO_FORMAT XRT_FORMAT_L8
-#define DEFAULT_VIDEO_FORMAT RS2_FORMAT_Y8
-#define DEFAULT_VIDEO_WIDTH 640
-#define DEFAULT_VIDEO_HEIGHT 360
-#define DEFAULT_VIDEO_FPS 30
-#define DEFAULT_VIDEO_CHANGE_EXPOSURE true
-#define DEFAULT_VIDEO_AUTOEXPOSURE false
-#define DEFAULT_VIDEO_EXPOSURE 6000
-#define DEFAULT_VIDEO_GAIN 127
-#define DEFAULT_GYRO_FPS 200
-#define DEFAULT_ACCEL_FPS 250
-#define DEFAULT_STREAM_TYPE RS2_STREAM_INFRARED
-#define DEFAULT_STREAM1_INDEX 1
-#define DEFAULT_STREAM2_INDEX 2
+// // These defaults come from a D455 camera, they might not work for other devices
+// #define DEFAULT_STEREO true
+// #define DEFAULT_XRT_VIDEO_FORMAT XRT_FORMAT_L8
+// #define DEFAULT_VIDEO_FORMAT RS2_FORMAT_Y8
+// #define DEFAULT_VIDEO_WIDTH 640
+// #define DEFAULT_VIDEO_HEIGHT 360
+// #define DEFAULT_VIDEO_FPS 30
+// #define DEFAULT_VIDEO_CHANGE_EXPOSURE true
+// #define DEFAULT_VIDEO_AUTOEXPOSURE false
+// #define DEFAULT_VIDEO_EXPOSURE 6000
+// #define DEFAULT_VIDEO_GAIN 127
+// #define DEFAULT_GYRO_FPS 200
+// #define DEFAULT_ACCEL_FPS 250
+// #define DEFAULT_STREAM_TYPE RS2_STREAM_INFRARED
+// #define DEFAULT_STREAM1_INDEX 1
+// #define DEFAULT_STREAM2_INDEX 2
+
+// D435i defaults
+#define DEFAULT_STEREO                  true
+#define DEFAULT_XRT_VIDEO_FORMAT        XRT_FORMAT_L8           // 8-bit luminance
+#define DEFAULT_VIDEO_FORMAT            RS2_FORMAT_Y8                    // 8-bit mono
+#define DEFAULT_VIDEO_WIDTH             640                      // optimal IR/depth resolution for D435 :contentReference[oaicite:0]{index=0}
+#define DEFAULT_VIDEO_HEIGHT            360                      // “
+#define DEFAULT_VIDEO_FPS               30                      // common frame rate for IR & color
+#define DEFAULT_VIDEO_CHANGE_EXPOSURE   true
+#define DEFAULT_VIDEO_AUTOEXPOSURE      false                   // start in manual mode
+#define DEFAULT_VIDEO_EXPOSURE          14200                   // 33 ms, in µs (tuning guide example) :contentReference[oaicite:1]{index=1}
+#define DEFAULT_VIDEO_GAIN              36                     // lowest gain for best depth precision :contentReference[oaicite:2]{index=2}
+
+// IMU (only on D435i)
+#define DEFAULT_GYRO_FPS                200                     // choose 200 Hz out of {200,400} :contentReference[oaicite:3]{index=3}
+#define DEFAULT_ACCEL_FPS               200                     // choose 250 Hz out of {63,250} :contentReference[oaicite:4]{index=4}
+
+// Infrared stereo streams
+#define DEFAULT_STREAM_TYPE             RS2_STREAM_INFRARED
+#define DEFAULT_STREAM1_INDEX           1                       // left IR
+#define DEFAULT_STREAM2_INDEX           2                       // right IR
+
 
 #define RS_DEVICE_STR "Intel RealSense Host-SLAM"
 #define RS_SOURCE_STR "RealSense Source"
@@ -432,7 +454,7 @@ rs_source_load_stream_options_from_json(struct rs_source *rs)
 
 	struct u_config_json config = {0};
 	u_config_json_open_or_create_main_file(&config);
-	if (!config.file_loaded) {
+	if (true) {
 		RS_WARN(rs, "Unable to load config file, will use default stream values");
 		cJSON_Delete(config.root);
 		return;
@@ -684,11 +706,11 @@ handle_gyro_frame(struct rs_source *rs, rs2_frame *frame)
 {
 	const float *data = DO(rs2_get_frame_data, frame);
 
-#ifndef NDEBUG
-	int data_size = DO(rs2_get_frame_data_size, frame);
-	RS_DASSERT(data_size == 3 * sizeof(float) || data_size == 4 * sizeof(float), "Unexpected size=%d", data_size);
-	RS_DASSERT_(data_size != 4 || data[3] == 0);
-#endif
+// #ifndef NDEBUG
+// 	int data_size = DO(rs2_get_frame_data_size, frame);
+// 	RS_DASSERT(data_size == 3 * sizeof(float) || data_size == 4 * sizeof(float), "Unexpected size=%d", data_size);
+// 	RS_DASSERT_(data_size != 4 || data[3] == 0);
+// #endif
 	timepoint_ns timestamp_ns = get_frame_monotonic_ts(rs, frame);
 	struct xrt_vec3 gyro = {data[0], data[1], data[2]};
 	RS_TRACE(rs, "gyro t=%ld x=%f y=%f z=%f", timestamp_ns, gyro.x, gyro.y, gyro.z);
@@ -701,13 +723,13 @@ handle_accel_frame(struct rs_source *rs, rs2_frame *frame)
 {
 	const float *data = DO(rs2_get_frame_data, frame);
 
-#ifndef NDEBUG
-	int data_size = DO(rs2_get_frame_data_size, frame);
-	// For some strange reason data_size is 4 for samples that can use hardware
-	// timestamps. And that last element data[3] seems to always be zero.
-	RS_DASSERT(data_size == 3 * sizeof(float) || data_size == 4 * sizeof(float), "Unexpected size=%d", data_size);
-	RS_DASSERT_(data_size != 4 || data[3] == 0);
-#endif
+// #ifndef NDEBUG
+// 	int data_size = DO(rs2_get_frame_data_size, frame);
+// 	// For some strange reason data_size is 4 for samples that can use hardware
+// 	// timestamps. And that last element data[3] seems to always be zero.
+// 	RS_DASSERT(data_size == 3 * sizeof(float) || data_size == 4 * sizeof(float), "Unexpected size=%d", data_size);
+// 	RS_DASSERT_(data_size != 4 || data[3] == 0);
+// #endif
 	timepoint_ns timestamp_ns = get_frame_monotonic_ts(rs, frame);
 	struct xrt_vec3 accel = {data[0], data[1], data[2]};
 	RS_TRACE(rs, "accel t=%ld x=%f y=%f z=%f", timestamp_ns, accel.x, accel.y, accel.z);

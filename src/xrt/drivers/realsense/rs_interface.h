@@ -28,6 +28,10 @@ struct xrt_frame_context;
 #define REALSENSE_TM2_VID 0x8087
 #define REALSENSE_TM2_PID 0x0B37
 
+
+#define REALSENSE_D435I_VID 0x8086
+#define REALSENSE_D435I_PID 0x0B3A
+
 #define RS_TRACKING_DISABLED -1
 #define RS_TRACKING_UNSPECIFIED 0
 #define RS_TRACKING_DEVICE_SLAM 1
@@ -61,6 +65,9 @@ rs_source_create(struct xrt_frame_context *xfctx, int device_idx);
 struct xrt_device *
 rs_create_tracked_device_internal_slam(void);
 
+
+    struct xrt_device *
+create_tracked_rs_device(struct xrt_prober *xp);
 /*!
  * @dir drivers/realsense
  *

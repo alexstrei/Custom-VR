@@ -385,7 +385,7 @@ euroc_player_fill_dataset_info(const char *path, euroc_player_dataset_info *data
 // Playback functionality
 
 static struct euroc_player *
-euroc_player(struct xrt_fs *xfs)
+euroc_player_constructor(struct xrt_fs *xfs)
 {
 	return (struct euroc_player *)xfs;
 }
@@ -601,7 +601,7 @@ static void *
 euroc_player_stream(void *ptr)
 {
 	struct xrt_fs *xfs = (struct xrt_fs *)ptr;
-	struct euroc_player *ep = euroc_player(xfs);
+	struct euroc_player *ep = euroc_player_constructor(xfs);
 	EUROC_INFO(ep, "Starting euroc playback");
 
 	euroc_player_preload(ep);
@@ -645,7 +645,7 @@ euroc_player_stream(void *ptr)
 static bool
 euroc_player_enumerate_modes(struct xrt_fs *xfs, struct xrt_fs_mode **out_modes, uint32_t *out_count)
 {
-	struct euroc_player *ep = euroc_player(xfs);
+	struct euroc_player *ep = euroc_player_constructor(xfs);
 
 	// Should be freed by caller
 	struct xrt_fs_mode *modes = U_TYPED_ARRAY_CALLOC(struct xrt_fs_mode, 1);
@@ -674,15 +674,15 @@ euroc_player_configure_capture(struct xrt_fs *xfs, struct xrt_fs_capture_paramet
 }
 
 #define DEFINE_RECEIVE_CAM(cam_id)                                                                                     \
-	static void receive_cam##cam_id(struct xrt_frame_sink *sink, struct xrt_frame *xf)                             \
-	{                                                                                                              \
-		struct euroc_player *ep = container_of(sink, struct euroc_player, cam_sinks[cam_id]);                  \
-		EUROC_TRACE(ep, "cam%d img t=%ld source_t=%ld", cam_id, xf->timestamp, xf->source_timestamp);          \
-		u_sink_debug_push_frame(&ep->ui_cam_sinks[cam_id], xf);                                                \
-		if (ep->out_sinks.cams[cam_id]) {                                                                      \
-			xrt_sink_push_frame(ep->out_sinks.cams[cam_id], xf);                                           \
-		}                                                                                                      \
-	}
+static void receive_cam##cam_id(struct xrt_frame_sink *sink, struct xrt_frame *xf)                             \
+{                                                                                                              \
+struct euroc_player *ep = container_of(sink, struct euroc_player, cam_sinks[cam_id]);                  \
+EUROC_TRACE(ep, "cam%d img t=%ld source_t=%ld", cam_id, xf->timestamp, xf->source_timestamp);          \
+u_sink_debug_push_frame(&ep->ui_cam_sinks[cam_id], xf);                                                \
+if (ep->out_sinks.cams[cam_id]) {                                                                      \
+xrt_sink_push_frame(ep->out_sinks.cams[cam_id], xf);                                           \
+}                                                                                                      \
+}
 
 
 DEFINE_RECEIVE_CAM(0)
@@ -690,6 +690,7 @@ DEFINE_RECEIVE_CAM(1)
 DEFINE_RECEIVE_CAM(2)
 DEFINE_RECEIVE_CAM(3)
 DEFINE_RECEIVE_CAM(4)
+
 
 //! Be sure to define the same number of definition as EUROC_MAX_CAMS and to add them to `receive_cam`.
 static void (*receive_cam[EUROC_MAX_CAMS])(struct xrt_frame_sink *, struct xrt_frame *) = {
@@ -732,7 +733,7 @@ euroc_player_stream_start(struct xrt_fs *xfs,
                           enum xrt_fs_capture_type capture_type,
                           uint32_t descriptor_index)
 {
-	struct euroc_player *ep = euroc_player(xfs);
+	struct euroc_player *ep = euroc_player_constructor(xfs);
 
 	if (xs == NULL && capture_type == XRT_FS_CAPTURE_TYPE_TRACKING) {
 		EUROC_INFO(ep, "Starting Euroc Player in tracking mode");
@@ -758,7 +759,7 @@ euroc_player_stream_start(struct xrt_fs *xfs,
 static bool
 euroc_player_slam_stream_start(struct xrt_fs *xfs, struct xrt_slam_sinks *sinks)
 {
-	struct euroc_player *ep = euroc_player(xfs);
+	struct euroc_player *ep = euroc_player_constructor(xfs);
 	ep->out_sinks = *sinks;
 	return euroc_player_stream_start(xfs, NULL, XRT_FS_CAPTURE_TYPE_TRACKING, 0);
 }
@@ -766,7 +767,7 @@ euroc_player_slam_stream_start(struct xrt_fs *xfs, struct xrt_slam_sinks *sinks)
 static bool
 euroc_player_stream_stop(struct xrt_fs *xfs)
 {
-	struct euroc_player *ep = euroc_player(xfs);
+	struct euroc_player *ep = euroc_player_constructor(xfs);
 	ep->is_running = false;
 
 	// Destroy also stops the thread.
@@ -778,7 +779,7 @@ euroc_player_stream_stop(struct xrt_fs *xfs)
 static bool
 euroc_player_is_running(struct xrt_fs *xfs)
 {
-	struct euroc_player *ep = euroc_player(xfs);
+	struct euroc_player *ep = euroc_player_constructor(xfs);
 	return ep->is_running;
 }
 

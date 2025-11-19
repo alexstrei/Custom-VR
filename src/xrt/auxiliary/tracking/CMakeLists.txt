@@ -56,9 +56,9 @@ if(XRT_HAVE_OPENCV)
 		PRIVATE aux_util_sink
 		)
 	# t_euroc_recorder needs a Windows implementation of os_realtime_get_ns.
-	if(NOT WIN32)
+#	if(NOT WIN32)
 		target_sources(aux_tracking PRIVATE t_euroc_recorder.cpp t_euroc_recorder.h)
-	endif()
+#	endif()
 endif()
 
 if(XRT_FEATURE_SLAM)
