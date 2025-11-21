@@ -9,10 +9,8 @@ This repository contains all 3D models, build instructions, and software setup s
 
 This project provides:
 - A **hardware design** for a custom VR headset  
-- Integration of a **Custom VR** driver
+- Integration of a **Custom VR** driver in Monado
 - Compiled binaries for [Basalt](https://github.com/CIFASIS/basalt-xr)
-
-
 ---
 
 ## Required Tools
@@ -41,6 +39,10 @@ These parts are used across the headset, primarily for the eye modules.
 | MIPI-to-HDMI Board | 2 | 1005008477815602 | AliExpress |
 
 ---
+
+## Assembly 
+
+An assembly video can be seen here: https://youtu.be/JpesEXfNubU but it still needs commentary.
 
 
 ## Project Status
