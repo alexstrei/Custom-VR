@@ -1,4 +1,4 @@
-# Monado - XR Runtime (XRT)
+# Copy of Monado - XR Runtime (XRT)
 
 <!--
 Copyright 2018-2021, Collabora, Ltd.
@@ -7,7 +7,10 @@ SPDX-License-Identifier: CC-BY-4.0
 
 This must stay in sync with the last section!
 -->
+This project is copied from Monado (links are below) and modified by myself.
 
+
+Please note 
 > * Main homepage and documentation: <https://monado.freedesktop.org/>
 > * Promotional homepage: <https://monado.dev>
 > * Maintained at <https://gitlab.freedesktop.org/monado/monado>

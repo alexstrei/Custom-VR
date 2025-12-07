@@ -1,7 +1,10 @@
 # Custom DIY VR Headset
 
-A fully open, 3D-printable VR headset featuring adjustable IPD, dual-display modules, and compatibility with **Monado** and optional **SteamVR** support.  
+A fully open, 3D-printable VR headset featuring adjustable IPD, dual-display modules, and integration with **Monado**.  
 This repository contains all 3D models, build instructions, and software setup steps required to assemble and run the headset.
+
+![Front of the Headset](./imgs/frontPerspective.jpg)
+
 
 ---
 
@@ -9,7 +12,8 @@ This repository contains all 3D models, build instructions, and software setup s
 
 This project provides:
 - A **hardware design** for a custom VR headset  
-- Integration of a **Custom VR** driver in Monado
+- Integration of a **Custom VR** driver in Monado ([Original Project](https://gitlab.freedesktop.org/monado/monado)
+---)
 - Compiled binaries for [Basalt](https://github.com/CIFASIS/basalt-xr)
 ---
 
@@ -43,6 +47,8 @@ These parts are used across the headset, primarily for the eye modules.
 ## Assembly 
 
 An assembly video can be seen here: https://youtu.be/JpesEXfNubU but it still needs commentary.
+Image of lens module can be seen here.
+![Lens Module](./imgs/LensModuleSideOpen.jpg.jpg)
 
 
 ## Project Status

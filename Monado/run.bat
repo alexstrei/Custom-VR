@@ -3,7 +3,7 @@
 set CUSTOM_VR_ENABLE=1
 set RS_SOURCE_INDEX=0
 set SLAM_CONFIG=.\d435i.toml
-set VIT_SYSTEM_LIBRARY_PATH=.\src\xrt\targets\service\basalt.dll
+set VIT_SYSTEM_LIBRARY_PATH=.\bin\mondo.....
 set XRT_DEBUG_GUI=1
 
 echo Environment variables set:
