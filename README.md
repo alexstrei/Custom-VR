@@ -48,7 +48,7 @@ These parts are used across the headset, primarily for the eye modules.
 
 An assembly video can be seen here: https://youtu.be/JpesEXfNubU but it still needs commentary.
 Image of lens module can be seen here.
-![Lens Module](./imgs/LensModuleSideOpen.jpg.jpg)
+![Lens Module](./imgs/LensModuleSideOpen.jpg)
 
 
 ## Project Status
